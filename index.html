@@ -93,8 +93,8 @@
 		monthfield.options[m]=new Option(monthtext[m], monthtext[m]);
 		monthfield.options[today.getMonth()]=new Option(monthtext[today.getMonth()], monthtext[today.getMonth()], true, true) ;//select today's month
 		var thisyear=today.getFullYear();
-		var myyear = thisyear - 20;
-		for (var y=0; y<20; y++){
+		var myyear = thisyear - 14;
+		for (var y=0; y<14; y++){
 		yearfield.options[y]=new Option(myyear, myyear)
 		myyear+=1
 		}
@@ -151,7 +151,7 @@
 		}
 
 		function style(feature) {
-			if (stateLevel = true) {
+			if (stateLevel == true) {
 				var id = feature.properties.STATE;
 				return {
 					fillColor: colorLogicState(id, date),
@@ -162,8 +162,9 @@
 					fillOpacity: 0.7
 				};
 			} else {
+				var id = "" + feature.properties.STATE + feature.properties.COUNTY;
 				return {
-					fillColor: colorLogic(feature.properties.STATE + feature.properties.COUNTY),
+					fillColor: colorLogic(id, date),
 					weight: 1,
 					opacity: 0.7,
 					color: 'white',
@@ -176,11 +177,13 @@
 		function colorLogic(countyID, date) {
 			var key = "";
 			var colorHex;
-			
+			console.log("county color");
 			//if (storeJSON[date].Value) {
-			if (true) {
+			if (countyData[date][countyID]) {
 				//colorHex = pickColor(storeJSON[date].Value);
-				colorHex = DEFAULT_COLOR;
+				console.log(countyData[date][countyID]);
+				console.log("COUNTY ID: " + countyID);
+				colorHex = pickColor(countyData[date][countyID]);
 			} else {
 				colorHex = DEFAULT_COLOR;
 			}
@@ -302,8 +305,16 @@
 
 		function pickColor(value) {
 			// DUMMY VALUES, BETWEEN 0 AND 200
-			var MEDIAN = 7000.0;
-			var MAX = 100000.0;
+			var MEDIAN;
+			var MAX;
+			if (stateLevel) {
+				var MEDIAN = 7000.0;
+				var MAX = 100000.0;
+			} else {
+				var MEDIAN = 10.0;
+				var MAX = 100.0;
+			}
+			
 			if (value < MEDIAN) {
 				var percent = value / MEDIAN;
 				return getGradientColor('#ffffd9', '#41b6c4', percent);
@@ -393,6 +404,7 @@
 			});
 
 			$('#change').click(function() {
+				stateLevel = true;
 				changeData();
 			});
 
