@@ -27,6 +27,29 @@
 			color: #FFFFDD;
 			font-size: 3em;
 		}
+		.info {
+		    padding: 6px 8px;
+		    font: 14px/16px Arial, Helvetica, sans-serif;
+		    background: white;
+		    background: rgba(255,255,255,0.8);
+		    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+		    border-radius: 5px;
+		}
+		.info h4 {
+		    margin: 0 0 5px;
+		    color: #777;
+		}
+		.legend {
+		    line-height: 18px;
+		    color: #555;
+		}
+		.legend i {
+		    width: 18px;
+		    height: 18px;
+		    float: left;
+		    margin-right: 8px;
+		    opacity: 0.7;
+		}
 	</style>
 	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.7/mapbox.js'></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -105,7 +128,12 @@
 			catDate += "-";
 			catDate += $('#monthdropdown').val();
 			catDate += "-"
-			catDate += $('#daydropdown').val();
+			var day = $('#daydropdown').val();
+			if (day.length == 1) {
+				console.log("FIXING THE DAY STUPID");
+				day = "0" + day;
+			}
+			catDate += day;
 			catDate += "T00:00:00Z";
 			return catDate;
 		}
@@ -200,7 +228,8 @@
 			currentState = e.target.feature.properties.STATE;
 			
 			if (currentState) {
-				var url = 'data/countygeo/' + currentState + '.json';
+				var url = 'geoJson_by_state/' + currentState + '.json';
+				console.log(url);
 				console.log("parsing in state number: " + currentState);
 				geojson.clearLayers();
 				attachDataToMap(url, map);
@@ -245,7 +274,7 @@
 		function changeData() {
 			date = getPickerDate();
 			geojson.clearLayers();
-			$.getJSON('data/USA.json', function(data) {
+			$.getJSON('data/USA_old.json', function(data) {
 				stateData = data;
 				console.log(stateData);
 				console.log(date);
@@ -255,8 +284,8 @@
 
 		function pickColor(value) {
 			// DUMMY VALUES, BETWEEN 0 AND 200
-			var MEDIAN = 6.0;
-			var MAX = 13.0;
+			var MEDIAN = 7000.0;
+			var MAX = 100000.0;
 
 			if (value < MEDIAN) {
 				var percent = value / MEDIAN;
@@ -320,7 +349,7 @@
 
 			L.tileLayer('https://{s}.tiles.mapbox.com/v4/samjabrahams.ln53g9ef/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2FtamFicmFoYW1zIiwiYSI6IlFYaEFqQWcifQ.wKho1oe6MY2xAtQ1uOYWrg').addTo(map);
 
-			$.getJSON('data/USA.json', function(data) {
+			$.getJSON('data/USA_old.json', function(data) {
 				console.log("State data retrieved");
 				stateData = data;
 				console.log("State data to follow:");
@@ -351,9 +380,26 @@
 			});
 
 			populatedropdown("daydropdown", "monthdropdown", "yeardropdown");
-			
-			
 
+			var legend = L.control({position: 'bottomright'});
+
+			legend.onAdd = function(map) {
+
+				var div = L.DomUtil.create('div', 'info legend'),
+					grades = [0, 100, 500, 1000, 4000, 7000, 15000, 50000, 100000],
+					labels = [];
+
+				for (var i = 0; i < grades.length; i++) {
+					div.innerHTML +=
+					'<i style="background:' + pickColor(grades[i] + 1) + '"></i> ' +
+					grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+				}
+
+				return div;
+
+			};
+
+			legend.addTo(map);
 		}		
 	</script>
 
