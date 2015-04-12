@@ -206,7 +206,7 @@
 
 			L.tileLayer('https://{s}.tiles.mapbox.com/v4/samjabrahams.ln53g9ef/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2FtamFicmFoYW1zIiwiYSI6IlFYaEFqQWcifQ.wKho1oe6MY2xAtQ1uOYWrg').addTo(map);
 
-			attachDataToMap('countyGeo.json', map);	
+			attachDataToMap('stateGeo.json', map);	
 			//connectData('data/51011.json');
 
 			// TEST HURRICANE KML FILE
@@ -215,7 +215,7 @@
 			$('#remove').click(function() {
 				geojson.clearLayers();
 				setTimeout(function() {
-					attachDataToMap('countyGeo.json', map)
+					attachDataToMap('stateGeo.json', map)
 				}, 4000 );
 			});
 
