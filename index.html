@@ -50,6 +50,18 @@
 		    margin-right: 8px;
 		    opacity: 0.7;
 		}
+		
+		header {
+			text-align: center;
+			margin-bottom: 12px;
+			margin-top: 12px;
+			font-family: sans-serif;
+		}
+
+		h1 {
+			color: #FFFFDD;
+			font-size: 3em;
+		}
 	</style>
 	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.7/mapbox.js'></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -180,10 +192,10 @@
 		function colorLogicState(stateID, date) {
 			var key = "";
 			//console.log("State ID: " + stateID);
-			var colorHex;
-			
+			var colorHex;		
 			if (stateData[date][stateID]) {
 				//console.log("value: " + stateData[date][stateID]);
+
 				colorHex = pickColor(stateData[date][stateID]);
 			} else {
 				colorHex = DEFAULT_COLOR;
@@ -286,7 +298,6 @@
 			// DUMMY VALUES, BETWEEN 0 AND 200
 			var MEDIAN = 7000.0;
 			var MAX = 100000.0;
-
 			if (value < MEDIAN) {
 				var percent = value / MEDIAN;
 				return getGradientColor('#ffffd9', '#41b6c4', percent);
@@ -410,6 +421,7 @@
 	
 	<button type="button" id="remove" value="clear">Clear the JSON Layer!</button>
 	<button type="button" id="color" value="color">Begin the coloration!</button>
+
 		<select id="daydropdown">
 		</select> 
 		<select id="monthdropdown">
@@ -417,6 +429,7 @@
 		<select id="yeardropdown">
 		</select> 
 	<button type="button" id="change" value="change">Update map</button>
+
 
 
 </body>
