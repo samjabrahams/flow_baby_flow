@@ -8,6 +8,10 @@
 			padding: 0;
 		}
 
+		body {
+			background-color: #000;
+		}
+
 		#map {
 			height: 700px;
 		}
@@ -15,7 +19,7 @@
 	<script src='https://api.tiles.mapbox.com/mapbox.js/v2.1.7/mapbox.js'></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-	
+
 	<link href='https://api.tiles.mapbox.com/mapbox.js/v2.1.7/mapbox.css' rel='stylesheet' />
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<script>
@@ -24,6 +28,12 @@
 			var map = L.map('map').setView([39.52, -98.4], 5);
 			
 			L.tileLayer('https://{s}.tiles.mapbox.com/v4/samjabrahams.ln53g9ef/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2FtamFicmFoYW1zIiwiYSI6IlFYaEFqQWcifQ.wKho1oe6MY2xAtQ1uOYWrg').addTo(map);
+
+			$.getJSON('countyGeo.json', function(data) {
+				L.geoJson(data).addTo(map);
+			});
+
+
 		}		
 	</script>
 
