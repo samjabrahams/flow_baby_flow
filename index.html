@@ -29,11 +29,9 @@
 
 		var DEFAULT_COLOR = '#444444';
 
-		var colorHex;
-
 		var date = "2000-07-01T00:00:00Z";
 
-		var storeJSON;
+		var storeJSON = [];
 
 		var colorArray = [
 			'#D1000F',
@@ -50,7 +48,7 @@
 
 		function style(feature) {
 			return {
-				fillColor: getData(feature.properties.STATE + feature.properties.COUNTY),
+				fillColor: colorLogic(feature.properties.STATE + feature.properties.COUNTY),
 				weight: 1,
 				opacity: 0.7,
 				color: 'white',
@@ -59,31 +57,23 @@
 			};
 		}
 
-		function getData(countyID) {
-			var URL = 'data/' + countyID + ".json";
+		function colorLogic(countyID) {
+			var key = "";
+			var colorHex;
 			
-			
-			$.ajax({
-				url: URL,
-				type: 'HEAD',
-				error: function() {
-					colorHex = DEFAULT_COLOR;
-				},
-				success: function() {
-					//connectData(URL);
-					$.getJSON(URL, function(data) {
-						//date = date + "T00:00:00Z";
-					storeJSON = data;
-					colorHex = pickColor(storeJSON[date].Value);
-					});
-				}
-			});
+			if (storeJSON[date].Value) {
+				colorHex = pickColor(storeJSON[date].Value);
+			} else {
+				colorHex = DEFAULT_COLOR;
+			}
 
 			return colorHex;
+			
 		}
 
 		// dataURL is a url to a JSON object
 		// Date is a date. Format to follow
+		/*
 		function connectData(dataURL) {
 			$.getJSON(dataURL, function(data) {
 				//date = date + "T00:00:00Z";
@@ -91,10 +81,10 @@
 
 			});
 		}
+		*/
 
 		function highlightFeature(e) {
 			var layer = e.target;
-
 			layer.setStyle({
 				weight: 2,
 				color: '#F00',
@@ -116,14 +106,23 @@
 				mouseout: resetHighlight
 			});
 		}
-
+		
 		function attachDataToMap(dataURL, map) {
-			$.getJSON(dataURL, function(data) {
+			$.getJSON('data/51011.json', function(data) {
+				
+				console.log("attaching data to map");
+
+				storeJSON = data;
+
+				$.getJSON(dataURL, function(data) {
 				geojson = L.geoJson(data, {
 					style: style,
 					onEachFeature: onEachFeature
 				}).addTo(map);
-			});
+			
+				});
+			})
+			
 		}
 
 		function changeColorTest(geojson) {
