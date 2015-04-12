@@ -115,7 +115,7 @@
 
 		var date = "2008-12-06T00:00:00Z";
 
-		var storeJSON = [];
+		var countyData;
 
 		var stateData;
 
@@ -240,11 +240,17 @@
 			currentState = e.target.feature.properties.STATE;
 			
 			if (currentState) {
-				var url = 'geoJson_by_state/' + currentState + '.json';
-				console.log(url);
-				console.log("parsing in state number: " + currentState);
-				geojson.clearLayers();
-				attachDataToMap(url, map);
+				stateLevel = false; 
+
+				$.getJSON('data/' + currentState + '.json', function(data) {
+					countyData = data;
+					var url = 'geoJson_by_state/' + currentState + '.json';
+					console.log(url);
+					console.log("parsing in state number: " + currentState);
+					geojson.clearLayers();
+					attachDataToMap(url, map);
+				});
+				
 			}
 		}
 
@@ -417,8 +423,6 @@
 </head>
 <body>
 	<header><h1>flow baby, flow.</h1></header>
-	<div id="map"></div>
-	
 	<button type="button" id="remove" value="clear">Clear the JSON Layer!</button>
 	<button type="button" id="color" value="color">Begin the coloration!</button>
 
@@ -429,9 +433,8 @@
 		<select id="yeardropdown">
 		</select> 
 	<button type="button" id="change" value="change">Update map</button>
-
-
-
+	<div id="map"></div>
+	
 </body>
 	
 </html>
