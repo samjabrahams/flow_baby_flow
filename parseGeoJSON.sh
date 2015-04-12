@@ -1,4 +1,7 @@
 #!/bin/bash
+
+#This script iterates through the file 90 times, outputting data from each state in a spearate file
+
 #Begin block happens once, middle block happens for each line in the file matching the pattern between //
 #END block happens once at the end
 #loop from 01 to 90 in increments of 1
