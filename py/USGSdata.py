@@ -2,11 +2,12 @@ import urllib2
 import pandas as pd
 import numpy as np
 import json
-import pdb
 import time
 import re
 import StringIO
 import matplotlib.pyplot as plt
+
+
 class USGSdata(object):
     '''
     A Class to interface to the USGS data bases via RESTlike interface. Data is output as a pandas data frame 
@@ -79,7 +80,7 @@ class USGSdata(object):
                             delimiter='\t',
                             comment  ='#')
 
-    def getCountyStatisticsData(self,countyIDs, stat_cd = '00001', startDT='2010-11-22', endDT='2014-11-22'):
+    def getCountyStatisticsData(self,countyID, stat_cd = '00001', startDT='2010-11-22', endDT='2014-11-22'):
         ''' 
         Get the Water Data for the specified county as specified by the county's 5 digit FIPS ID. Statistics stat_cd codes are:
             'Maximum Values':"00001",
@@ -98,8 +99,7 @@ class USGSdata(object):
         '''
         # Build the REST arguments
         # County
-        countySTR = [str(cty) for cty in countyIDs]
-        countyArg = "countyCd="+','.join(countySTR)
+        countyArg = "countyCd="+','.join(countyID)
         # Format 
         formatArg = "format=rdb"
         # Codes (convert to String if in wrong format)
@@ -115,7 +115,7 @@ class USGSdata(object):
         # REST Argument
         arg = "&".join([countyArg,formatArg,stat_cdArg,dateArg,parameterArgs])
         RESTrequest = self.dataPath + arg
-        print RESTrequest
+
         # Get data
         try:
             # Open the data url
@@ -157,15 +157,15 @@ def parse_USGS_csv(urlData):
 if __name__ == '__main__':
     
     waterData = USGSdata()
-    counties = waterData.countyData['USGS County Codes'].iloc[np.arange(0,1000,20)]
-    for county in counties:
+    path = '../data/'
+    for county in waterData.countyData['USGS County Codes']:
         try:
             print county
-            data=waterData.getCountyStatisticsData([county],
-                            stat_cd='00001',
-                            startDT='2006-01-01',
-                            endDT='2014-01-01')
-            print 'County: %s, data: %d'%(county, len(data))
+            DF = waterData.getCountyStatisticsData(['01005'],
+            stat_cd='00003',startDT='2000-07-01',endDT='2014-08-01')
+            DF.to_json('../data/'+county+'.json',date_format='iso',
+            orient = 'index', date_unit='s')
         except:
+            print('Data Failed')
             pass
         
