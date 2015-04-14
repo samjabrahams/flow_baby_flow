@@ -82,23 +82,28 @@
 	var monthtext=["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"];
 
 	function populatedropdown(dayfield, monthfield, yearfield){
+
+		var yearWanted = 2011;
+		var monthWanted = "10";
+		var dayWanted = "06";
+
 		var today=new Date();
 		var dayfield=document.getElementById(dayfield);
 		var monthfield=document.getElementById(monthfield);
 		var yearfield=document.getElementById(yearfield);
 		for (var i=0; i<31; i++)
 		dayfield.options[i]=new Option(i, i+1);
-		dayfield.options[today.getDate()]=new Option(today.getDate(), today.getDate(), true, true) ;//select today's day
+		dayfield.options[today.getDate()]=new Option(dayWanted, dayWanted, true, true) ;//select today's day
 		for (var m=0; m<12; m++)
 		monthfield.options[m]=new Option(monthtext[m], monthtext[m]);
-		monthfield.options[today.getMonth()]=new Option(monthtext[today.getMonth()], monthtext[today.getMonth()], true, true) ;//select today's month
-		var thisyear=today.getFullYear();
-		var myyear = thisyear - 14;
-		for (var y=0; y<14; y++){
+		monthfield.options[today.getMonth()]=new Option(monthWanted, monthWanted, true, true) ;//select today's month
+		var thisyear=2011;
+		var myyear = thisyear - 10;
+		for (var y=0; y<10; y++){
 		yearfield.options[y]=new Option(myyear, myyear)
 		myyear+=1
 		}
-		yearfield.options[yearfield.options.length]=new Option(today.getFullYear(), today.getFullYear(), true, true) //select today's year
+		yearfield.options[yearfield.options.length]=new Option(2011, 2011, true, true) //select today's year
 	}
 
 	</script>
@@ -113,13 +118,17 @@
 
 		var DEFAULT_COLOR = '#444444';
 
-		var date = "2008-12-06T00:00:00Z";
+		var date;
 
-		var countyData;
-
-		var stateData;
+		var waterData;
 
 		var currentState;
+
+		var stateLevel = true;
+
+		var RAW = 0;
+
+		var dataType;
 
 		var colorArray = [
 			'#D1000F',
@@ -142,12 +151,31 @@
 			catDate += "-"
 			var day = $('#daydropdown').val();
 			if (day.length == 1) {
-				console.log("FIXING THE DAY STUPID");
 				day = "0" + day;
 			}
 			catDate += day;
 			catDate += "T00:00:00Z";
 			return catDate;
+		}
+
+		function getMaxJSON(array, property) {
+			var max;
+			for (var i = 0; i < arr.length; i++) {
+				if (!max || parseInt(array[i][property]) > max) {
+					max = array[i][property];
+				}
+			}
+			return max;
+		}
+
+		function getMinJSON(array, property) {
+			var min;
+			for (var i = 0; i < arr.length; i++) {
+				if (!min || parseInt(array[i][property]) < min) {
+					max = array[i][property];
+				}
+			}
+			return min;
 		}
 
 		function style(feature) {
@@ -164,7 +192,7 @@
 			} else {
 				var id = "" + feature.properties.STATE + feature.properties.COUNTY;
 				return {
-					fillColor: colorLogic(id, date),
+					fillColor: colorLogicCounty(id, date),
 					weight: 1,
 					opacity: 0.7,
 					color: 'white',
@@ -174,16 +202,16 @@
 			}
 		}
 
-		function colorLogic(countyID, date) {
+		function colorLogicCounty(countyID, date) {
 			var key = "";
 			var colorHex;
 			console.log("county color");
 			//if (storeJSON[date].Value) {
-			if (countyData[date][countyID]) {
+			if (waterData[date][countyID]) {
 				//colorHex = pickColor(storeJSON[date].Value);
-				console.log(countyData[date][countyID]);
+				console.log(waterData[date][countyID]);
 				console.log("COUNTY ID: " + countyID);
-				colorHex = pickColor(countyData[date][countyID]);
+				colorHex = pickColor(waterData[date][countyID]);
 			} else {
 				colorHex = DEFAULT_COLOR;
 			}
@@ -196,10 +224,10 @@
 			var key = "";
 			//console.log("State ID: " + stateID);
 			var colorHex;		
-			if (stateData[date][stateID]) {
-				//console.log("value: " + stateData[date][stateID]);
+			if (waterData[date][stateID]) {
+				//console.log("value: " + waterData[date][stateID]);
 
-				colorHex = pickColor(stateData[date][stateID]);
+				colorHex = pickColor(waterData[date][stateID]);
 			} else {
 				colorHex = DEFAULT_COLOR;
 			}
@@ -243,16 +271,21 @@
 			currentState = e.target.feature.properties.STATE;
 			
 			if (currentState) {
+				var countyURL = currentState + '.json';
+
+				changeMapData(countyURL, countyURL, false, map);
+				/*
 				stateLevel = false; 
 
 				$.getJSON('data/' + currentState + '.json', function(data) {
-					countyData = data;
+					waterData = data;
 					var url = 'geoJson_by_state/' + currentState + '.json';
 					console.log(url);
 					console.log("parsing in state number: " + currentState);
 					geojson.clearLayers();
 					attachDataToMap(url, map);
 				});
+				*/
 				
 			}
 		}
@@ -265,15 +298,20 @@
 			});
 		}
 		
-		function attachDataToMap(dataURL, map) {
-			
+		function attachDataToMap(geoURL, map) {
+				var geoDirectory;
 
-				$.getJSON(dataURL, function(data) {
-				geojson = L.geoJson(data, {
-					style: style,
-					onEachFeature: onEachFeature
-				}).addTo(map);
-			
+				if (stateLevel) {
+					geoDirectory = "geojson/";
+				} else {
+					geoDirectory = "geojson/counties/";
+				}
+
+				$.getJSON(geoDirectory + geoURL, function(data) {
+					geojson = L.geoJson(data, {
+						style: style,
+						onEachFeature: onEachFeature
+					}).addTo(map);
 				});	
 		}
 
@@ -292,16 +330,6 @@
 			colorIndex++;
 		}
 
-		function changeData() {
-			date = getPickerDate();
-			geojson.clearLayers();
-			$.getJSON('data/USA_old.json', function(data) {
-				stateData = data;
-				console.log(stateData);
-				console.log(date);
-				attachDataToMap('stateGeo.json', map);
-			});
-		}
 
 		function pickColor(value) {
 			// DUMMY VALUES, BETWEEN 0 AND 200
@@ -311,8 +339,8 @@
 				var MEDIAN = 7000.0;
 				var MAX = 100000.0;
 			} else {
-				var MEDIAN = 10.0;
-				var MAX = 100.0;
+				var MEDIAN = 30.0;
+				var MAX = 70.0;
 			}
 			
 			if (value < MEDIAN) {
@@ -372,22 +400,39 @@
 			return '#' + diff_red + diff_green + diff_blue;
 		};
 
+		
+		// Primary function to switch
+		function changeMapData(dataURL, geoJsonURL, isStateLevel, map) {
+			var dataSubfolder;
+			date = getPickerDate();
+			console.log(date);
+
+			if (geojson) {
+				geojson.clearLayers();
+			}
+
+			switch (dataType) {
+				case RAW:
+					dataSubfolder = "data/raw/";
+					break;
+				default:
+					dataSubfolder = "data/raw/";
+			}
+
+			$.getJSON(dataSubfolder + dataURL, function(data) {
+				waterData = data;
+				stateLevel = isStateLevel;
+				attachDataToMap(geoJsonURL, map);
+			});
+		}
+
 		window.onload = function() {
+			dataType = RAW;
+
 			map = L.map('map').setView([39.52, -98.4], 5);
 
 			L.tileLayer('https://{s}.tiles.mapbox.com/v4/samjabrahams.ln53g9ef/{z}/{x}/{y}.png?access_token=pk.eyJ1Ijoic2FtamFicmFoYW1zIiwiYSI6IlFYaEFqQWcifQ.wKho1oe6MY2xAtQ1uOYWrg').addTo(map);
 
-			$.getJSON('data/USA_old.json', function(data) {
-				console.log("State data retrieved");
-				stateData = data;
-				console.log("State data to follow:");
-				console.log(stateData);
-				stateLevel = true;
-				attachDataToMap('stateGeo.json', map);
-			});
-			//connectData('data/51011.json');
-
-			// TEST HURRICANE KML FILE
 			//omnivore.kml('test_kml.kml').addTo(map);		
 
 			$('#remove').click(function() {
@@ -404,8 +449,7 @@
 			});
 
 			$('#change').click(function() {
-				stateLevel = true;
-				changeData();
+				changeMapData('USA_old.json', 'stateGeo.json', true, map);
 			});
 
 			populatedropdown("daydropdown", "monthdropdown", "yeardropdown");
@@ -413,6 +457,8 @@
 			var legend = L.control({position: 'bottomright'});
 
 			legend.onAdd = function(map) {
+
+				console.log("adding legend to map");
 
 				var div = L.DomUtil.create('div', 'info legend'),
 					grades = [0, 100, 500, 1000, 4000, 7000, 15000, 50000, 100000],
@@ -429,6 +475,8 @@
 			};
 
 			legend.addTo(map);
+
+			changeMapData('USA_old.json', 'stateGeo.json', true, map);
 		}		
 	</script>
 

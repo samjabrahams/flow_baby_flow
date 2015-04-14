@@ -1,5 +1,0 @@
-#!/bin/bash
-for c in {01..56..1}
-do
-cp $c.txt $c.json
-done
