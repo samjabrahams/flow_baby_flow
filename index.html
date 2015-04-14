@@ -96,7 +96,7 @@
 		dayfield.options[today.getDate()]=new Option(dayWanted, dayWanted, true, true) ;//select today's day
 		for (var m=0; m<12; m++)
 		monthfield.options[m]=new Option(monthtext[m], monthtext[m]);
-		monthfield.options[today.getMonth()]=new Option(monthWanted, monthWanted, true, true) ;//select today's month
+		monthfield.options[monthWanted - 1]=new Option(monthWanted, monthWanted, true, true) ;//select today's month
 		var thisyear=2011;
 		var myyear = thisyear - 10;
 		for (var y=0; y<10; y++){
