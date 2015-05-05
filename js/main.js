@@ -347,6 +347,7 @@
 
 			$('#btn-national').click(function() {
 				changeMapData('USA_old.json', 'stateGeo.json', true, map);
+				map.setView([39.52, -98.4], 5);
 			});
 
 			populatedropdown("daydropdown", "monthdropdown", "yeardropdown");
