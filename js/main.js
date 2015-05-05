@@ -337,6 +337,15 @@
 			});
 
 			$('#change').click(function() {
+				if (stateLevel) {
+					changeMapData('USA_old.json', 'stateGeo.json', true, map);
+				} else {
+					var countyURL = currentState + '.json';
+					changeMapData(countyURL, countyURL, false, map);
+				}
+			});
+
+			$('#btn-national').click(function() {
 				changeMapData('USA_old.json', 'stateGeo.json', true, map);
 			});
 
