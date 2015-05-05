@@ -7,6 +7,7 @@
 
 		body {
 			background-color: #000;
+			color: #FFFFDD;
 		}
 
 		#map {
@@ -24,6 +25,15 @@
 			color: #FFFFDD;
 			font-size: 3em;
 		}
+		select, button {
+			margin-left: 0;
+			margin-right: 8px;
+		}
+
+		p {
+			margin-bottom: 2px;
+		}
+
 		.info {
 		    padding: 6px 8px;
 		    background: white;
