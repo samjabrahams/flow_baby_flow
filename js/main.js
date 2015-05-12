@@ -312,10 +312,18 @@
 				stateLevel = isStateLevel;
 				attachDataToMap(geoJsonURL, map);
 			});
+
+			if (isStateLevel) {
+				$('#btn-national').hide();
+			} else {
+				$('#btn-national').show();
+			}
 		}
 
 		window.onload = function() {
 			dataType = RAW;
+
+			$('#btn-national').hide();
 
 			map = L.map('map').setView([39.52, -98.4], 5);
 
