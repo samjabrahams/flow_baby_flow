@@ -18,6 +18,8 @@
 
 		var dataType;
 
+		var info;
+
 		var colorArray = [
 			'#D1000F',
 			'#C0001A',
@@ -147,10 +149,15 @@
 			if (!L.Browser.ie && !L.Browser.opera) {
 				layer.bringToFront();
 			}
+
+			console.log(layer.feature.properties);
+
+			info.update(layer.feature.properties);
 		}
 
 		function resetHighlight(e) {
 			geojson.resetStyle(e.target);
+			info.update();
 		}
 
 		function zoomToFeature(e) {
@@ -370,6 +377,8 @@
 					grades = [0, 100, 500, 1000, 4000, 7000, 15000, 50000, 100000],
 					labels = [];
 
+					div.innerHTML += '<h3>Water Flow (gal/s)</h3>';
+
 				for (var i = 0; i < grades.length; i++) {
 					div.innerHTML +=
 					'<i style="background:' + pickColor(grades[i] + 1) + '"></i> ' +
@@ -381,6 +390,22 @@
 			};
 
 			legend.addTo(map);
+
+			info = L.control();
+
+			info.onAdd = function(map) {
+				this._div = L.DomUtil.create('div', 'info'); //create div with class 'info'
+				this.update();
+				return this._div;
+			};
+
+			// method used to update the control based on feature properties passed
+			info.update = function(props) {
+				this._div.innerHTML = '<h4>Water Flow</h4>' + (props ? '<b>' + props.NAME
+					+ '</b><br />' + '<b>' + waterData[date][props.STATE] +'</b>' : 'Hover over a ' + (stateLevel ? 'state' : 'county'));
+			};
+
+			info.addTo(map);
 
 			changeMapData('USA_old.json', 'stateGeo.json', true, map);
 		}	
